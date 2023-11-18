@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Paliwa</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Kalkulator Paliwa</h1>
+        <label for="spalanie">Spalanie (l/100km):</label>
+        <input type="number" id="spalanie" placeholder="Spalanie">
+        <label for="dystans">Dystans (km):</label>
+        <input type="number" id="dystans" placeholder="Dystans">
+        <label for="cenaZaLitr">Cena za litr (PLN):</label>
+        <input type="number" id="cenaZaLitr" placeholder="Cena za litr">
+        <button onclick="obliczPaliwo()">Oblicz</button>
+        <div id="wynik"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,23 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Paliwa</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Następny wywóz śmieci</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #0056b3;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Kalkulator Paliwa</h1>
-        <label for="spalanie">Spalanie (l/100km):</label>
-        <input type="number" id="spalanie" placeholder="Spalanie">
-        <label for="dystans">Dystans (km):</label>
-        <input type="number" id="dystans" placeholder="Dystans">
-        <label for="cenaZaLitr">Cena za litr (PLN):</label>
-        <input type="number" id="cenaZaLitr" placeholder="Cena za litr">
-        <button onclick="obliczPaliwo()">Oblicz</button>
-        <div id="wynik"></div>
+        <h1>Następny wywóz śmieci</h1>
+        <div id="paperCollection">Ładowanie danych...</div>
+        <div id="bioWasteCollection">Ładowanie danych...</div>
+        <div id="residualWasteCollection">Ładowanie danych...</div>
     </div>
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('allestrassenbubsheim.csv')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then(csvData => {
+                    const collectionDates = getNextCollectionDates(csvData);
+                    document.getElementById('paperCollection').textContent = `Następny wywóz papieru: ${collectionDates.paper}`;
+                    document.getElementById('bioWasteCollection').textContent = `Następny wywóz biomüll: ${collectionDates.bioWaste}`;
+                    document.getElementById('residualWasteCollection').textContent = `Następny wywóz restmüll: ${collectionDates.residualWaste}`;
+                })
+                .catch(error => {
+                    console.error('Failed to load the CSV file:', error);
+                    document.getElementById('paperCollection').textContent = 'Błąd podczas ładowania danych.';
+                    document.getElementById('bioWasteCollection').textContent = 'Błąd podczas ładowania danych.';
+                    document.getElementById('residualWasteCollection').textContent = 'Błąd podczas ładowania danych.';
+                });
+        });
+
+        function getNextCollectionDates(csvData) {
+            const rows = csvData.split('\n').slice(1).map(row => row.split(';'));
+            const today = new Date();
+            const dates = {
+                paper: 'brak danych',
+                bioWaste: 'brak danych',
+                residualWaste: 'brak danych'
+            };
+
+            rows.forEach(row => {
+                const paperDate = new Date(row[0].trim());
+                const bioWasteDate = new Date(row[1].trim());
+                const residualWasteDate = new Date(row[2].trim());
+
+                if (paperDate > today && (dates.paper === 'brak danych' || paperDate < new Date(dates.paper))) {
+                    dates.paper = paperDate.toLocaleDateString('pl-PL');
+                }
+                if (bioWasteDate > today && (dates.bioWaste === 'brak danych' || bioWasteDate < new Date(dates.bioWaste))) {
+                    dates.bioWaste = bioWasteDate.toLocaleDateString('pl-PL');
+                }
+                if (residualWasteDate > today && (dates.residualWaste === 'brak danych' || residualWasteDate < new Date(dates.residualWaste))) {
+                    dates.residualWaste = residualWasteDate.toLocaleDateString('pl-PL');
+                }
+            });
+
+            return dates;
+        }
+    </script>
 </body>
 </html>
